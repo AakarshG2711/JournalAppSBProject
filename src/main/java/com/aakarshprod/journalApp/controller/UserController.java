@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aakarshprod.journalApp.api.response.QuotesResponse;
 import com.aakarshprod.journalApp.api.response.WeatherResponse;
 import com.aakarshprod.journalApp.entity.User;
 import com.aakarshprod.journalApp.repository.UserRepository;
+import com.aakarshprod.journalApp.service.QuotesService;
 import com.aakarshprod.journalApp.service.UserService;
 import com.aakarshprod.journalApp.service.WeatherService;
 
@@ -32,6 +34,9 @@ public class UserController {
 
     @Autowired
     private WeatherService weatherService;
+
+    @Autowired 
+    private QuotesService quotesService;
 
     @PutMapping()
     public ResponseEntity<?> updateUser(@RequestBody User user){
@@ -57,10 +62,15 @@ public class UserController {
     public ResponseEntity<?> greetings(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         WeatherResponse weatherResponse = weatherService.getWeather("Mumbai");
+        QuotesResponse quotesResponse = quotesService.getQuotes();
         String greetings = " " ;
+        String quotes = " " ;
         if(weatherResponse != null){
             greetings = "Weather feels like " + weatherResponse.getCurrent().getFeelslike();
         }
-        return new ResponseEntity<>("Hi " + authentication.getName() + greetings , HttpStatus.OK);
+        if(quotesResponse != null){
+            quotes = " Quote of the day is " + quotesResponse.getData().getQuote();
+        }
+        return new ResponseEntity<>("Hi " + authentication.getName() + greetings + quotes , HttpStatus.OK);
     }
 }     
